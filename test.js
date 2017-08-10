@@ -1,4 +1,4 @@
-const {cut, count} = require('./index');
+const {cut, count, tokenize} = require('./index');
 
 // test dataset
 const texts = {
@@ -7,7 +7,10 @@ const texts = {
     "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "Where is my mind, where should I look for it ?",
     "I'm happy that I ain't wasted that much time!",
-    "Rodrigue as-tu du cœur ?"
+    "Rodrigue as-tu du cœur ?",
+    "Ce qu‘il m’a donné à manger… jeûner pour 50€ (HT) été£ %été^ été! ",
+    "espace ; insécable devant le point-virgule, le point d'exclamation ! et d'interrogation ?",
+    "¿Donde hacemos la peña?"
   ],
   de: [
     // Johann Wolfgang von Goethe, Erlkönig, 1782
@@ -84,13 +87,15 @@ Porter partout l'effroi dans une armée entière.
 J'ai vu par sa valeur cent escadrons rompus ;
 Et pour t'en dire encore quelque chose de plus,
 Plus que brave soldat, plus que grand capitaine, C'est...`,
-  // Franck Ribéry, Interview, Oct 2015
-    "Le traitement médiatique français m’a beaucoup blessé. Cela a même blessé mon entourage qui m’entoure. Je suis un grand joueur respecté dans tous les pays du monde sauf en France, c’est comme si Messi n’était pas aimé au Brésil."
+    // Franck Ribéry, Interview, Oct 2015
+    "Le traitement médiatique français m’a beaucoup blessé. Cela a même blessé mon entourage qui m’entoure. Je suis un grand joueur respecté dans tous les pays du monde sauf en France, c’est comme si Messi n’était pas aimé au Brésil.",
+    // Roland Barthe, Mythologies, 20??
+    "Œuvres d'été, œuvres diverses."
   ]
 };
 
 
-describe('cutting words', () => {
+describe('basic operations:', () => {
   it('should cut sentences into words', () => {
     // hello world
     expect(cut(texts.short[0])).toEqual(['hello', 'world']);
@@ -101,7 +106,49 @@ describe('cutting words', () => {
     expect(lorem.length).toBe(20);
 
     // punctuation at the end
-    expect(cut(texts.short[2])[9]).toBe('it')
-    expect(cut(texts.short[3])[10]).toBe('time')
+    expect(cut(texts.short[2])[9]).toBe('it');
+    expect(cut(texts.short[3])[10]).toBe('time');
+
+    // special characters in words
+    expect(cut(texts.short[4])[4]).toBe('cœur');
+
+    // special characters between words
+    expect(cut(texts.short[5])[6]).toBe('manger');
+    expect(cut(texts.short[6])[0]).toBe('espace');
   });
+  it('should deduplicate words', () => {
+    expect(count(['hello', 'world']).size).toBe(2);
+    expect(count(['hello', 'hello']).size).toBe(1);
+    const numbers = count(['one', 'two', 'three', 'two']);
+    expect(numbers.get('one')).toBe(1);
+    expect(numbers.get('two')).toBe(2);
+  });
+});
+
+describe('real life examples', () => {
+  it('should like Shakespear', () => {
+    const shakespearWords = tokenize(texts.en[0]);
+    expect(shakespearWords.get('the')).toBe(11);
+    expect(shakespearWords.get('polonius')).toBe(2);
+    expect(shakespearWords.get('claudius')).toBe(5);
+  });
+  it('should be able to read multi-lines Eminem', () => {
+    const eminemWords = tokenize(texts.en[1]);
+    expect(eminemWords.get('did')).toBe(2);
+  });
+  it('should be able to read Latin and special caracters', () => {
+    const kierkegaardWords = tokenize(texts.dk[0]);
+    expect(kierkegaardWords.get('erindring')).toBe(1);
+    const goetheWords = tokenize(texts.de[0]);
+    expect(goetheWords.get('faßt')).toBe(2);
+    const corneilleWords = tokenize(texts.fr[0]);
+    expect(corneilleWords.get('eût')).toBe(1);
+    expect(corneilleWords.get('plus')).toBe(4);
+    const riberyWords = tokenize(texts.fr[1]);
+    expect(riberyWords.get('blessé')).toBe(2);
+    expect(riberyWords.get('entoure')).toBe(1);
+    const bartheWords = tokenize(texts.fr[2]);
+    expect(bartheWords.get('œuvres')).toBe(2);
+  });
+
 });

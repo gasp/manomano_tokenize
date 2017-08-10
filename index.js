@@ -1,5 +1,17 @@
+/*
+ * extract words from a string
+ * @param {String}
+ * @return {Map} dictionary of words and occurence
+ */
+const tokenize = (string) => count(cut(string), new Map());
+
+/*
+ * cut sentences un words
+ * @param {String}
+ * @return {Array} of words
+ */
 function cut(string) {
-  return string.split(/[\s,.\[\]$\?¿\!¡'"()+-]+/);
+  return string.split(/[\s,.\[\]$\?¿\!¡’\\&%^*|$€£§=…'"()+-]+/);
 }
 
 /*
@@ -20,4 +32,4 @@ function count(words, dictionary = new Map()) {
   return dictionary;
 }
 
-module.exports = { cut, count };
+module.exports = { cut, count, tokenize };
