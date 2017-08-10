@@ -1,0 +1,15 @@
+{
+  "name": "tokenize",
+  "version": "0.1.0",
+  "description": "segment words from a string",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine": "^2.7.0"
+  },
+  "scripts": {
+    "test": "jasmine test.js"
+  },
+  "author": "gasp",
+  "license": "ISC"
+}
