@@ -1,11 +1,11 @@
 tokenize counts word occurences
 
-#install
+# install
 
 `npm i wordcount -S`
 
 
-#simple usage:
+# simple usage:
 
 ```
 const { tokenize } = require('tokenize');
