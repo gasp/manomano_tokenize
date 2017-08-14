@@ -49,6 +49,9 @@ describe('combining simple cases', () => {
 
 // test dataset
 const texts = {
+  cr: [
+    'Cigareta, pušenje, nikotin i duvanski dim - šta sve duvan sadrži'
+  ],
   de: [
     // Johann Wolfgang von Goethe, Erlkönig, 1782
     `Wer reitet so spät durch Nacht und Wind?
@@ -156,6 +159,8 @@ describe('real life examples', () => {
     expect(riberyWords.get('entoure')).toBe(1);
     const bartheWords = tokenize(texts.fr[2]);
     expect(bartheWords.get('œuvres')).toBe(2);
+    const croatian = tokenize(texts.cr[0]);
+    expect(croatian.size).toBe(10);
   });
 
 });
