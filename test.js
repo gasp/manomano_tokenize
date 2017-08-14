@@ -1,17 +1,54 @@
 const {cut, count, tokenize} = require('./index');
 
+describe('simply cutting words', () => {
+  it('should cut sentences into words', () => {
+    expect(cut('hello world')).toEqual(['hello', 'world']);
+
+    const lorem = cut('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.');
+    expect(lorem[0]).toEqual('Lorem');
+    expect(lorem[4]).toEqual('amet');
+    expect(lorem.length).toBe(20);
+
+    // punctuation at the end
+    const myMind = cut('Where is my mind, where should I look for it ?');
+    expect(myMind[9]).toBe('it');
+
+    // special characters in words
+    const specialChar = cut('Rodrigue as-tu du cœur ?');
+    expect(specialChar[4]).toBe('cœur');
+
+    // special characters between words
+    expect(cut('Ce qu‘il m’a donné à manger… jeûner pour 50€ (HT) été£ %été^ été! ')[6]).toBe('manger');
+    expect(cut('espace ; insécable devant le point-virgule, le point d\'exclamation ! et d\'interrogation ?')[0]).toBe('espace');
+  });
+});
+
+describe('simply counting occurences', () => {
+  it('should count words', () => {
+    expect(count(['hello', 'world']).size).toBe(2);
+    expect(count([]).size).toBe(0);
+  });
+  it('should deduplicate words', () => {
+    expect(count(['hello', 'hello']).size).toBe(1);
+    const numbers = count(['one', 'two', 'three', 'two']);
+    expect(numbers.get('one')).toBe(1);
+    expect(numbers.get('two')).toBe(2);
+    expect(count(['Capital', 'capital', 'CAPITAL']).size).toBe(1);
+  });
+});
+
+describe('combining simple cases', () => {
+  it('should check ignored word size limit', () => {
+    expect(tokenize('Hello world').size).toBe(2);
+    expect(tokenize('Hello a world', 2).size).toBe(2);
+    expect(tokenize('one two three four five', 3).size).toBe(3);
+    expect(tokenize('one two three four five', 999).size).toBe(0);
+  });
+});
+
+
 // test dataset
 const texts = {
-  short: [
-    "hello world",
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "Where is my mind, where should I look for it ?",
-    "I'm happy that I ain't wasted that much time!",
-    "Rodrigue as-tu du cœur ?",
-    "Ce qu‘il m’a donné à manger… jeûner pour 50€ (HT) été£ %été^ été! ",
-    "espace ; insécable devant le point-virgule, le point d'exclamation ! et d'interrogation ?",
-    "¿Donde hacemos la peña?"
-  ],
   de: [
     // Johann Wolfgang von Goethe, Erlkönig, 1782
     `Wer reitet so spät durch Nacht und Wind?
@@ -94,36 +131,6 @@ Plus que brave soldat, plus que grand capitaine, C'est...`,
   ]
 };
 
-
-describe('basic operations:', () => {
-  it('should cut sentences into words', () => {
-    // hello world
-    expect(cut(texts.short[0])).toEqual(['hello', 'world']);
-    // Lorem
-    const lorem = cut(texts.short[1]);
-    expect(lorem[0]).toEqual('Lorem');
-    expect(lorem[4]).toEqual('amet');
-    expect(lorem.length).toBe(20);
-
-    // punctuation at the end
-    expect(cut(texts.short[2])[9]).toBe('it');
-    expect(cut(texts.short[3])[10]).toBe('time');
-
-    // special characters in words
-    expect(cut(texts.short[4])[4]).toBe('cœur');
-
-    // special characters between words
-    expect(cut(texts.short[5])[6]).toBe('manger');
-    expect(cut(texts.short[6])[0]).toBe('espace');
-  });
-  it('should deduplicate words', () => {
-    expect(count(['hello', 'world']).size).toBe(2);
-    expect(count(['hello', 'hello']).size).toBe(1);
-    const numbers = count(['one', 'two', 'three', 'two']);
-    expect(numbers.get('one')).toBe(1);
-    expect(numbers.get('two')).toBe(2);
-  });
-});
 
 describe('real life examples', () => {
   it('should like Shakespear', () => {

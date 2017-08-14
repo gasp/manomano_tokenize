@@ -1,9 +1,14 @@
 /*
  * extract words from a string
  * @param {String}
+ * @param {Number} limit ignored word maxlength
  * @return {Map} dictionary of words and occurence
  */
-const tokenize = (string) => count(cut(string), new Map());
+const tokenize = (string, limit = 0) => {
+  const words = cut(string);
+  const selectedWords = words.filter((word) => word.length > limit);
+  return count(selectedWords);
+};
 
 /*
  * cut sentences un words
